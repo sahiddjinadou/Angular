@@ -137,6 +137,66 @@ Les événements en Angular jouent un rôle crucial dans la communication entre 
    }
    ```
 
+   ## Cas d'Utilisation des Événements
+
+1. **Interaction Utilisateur** :
+   - **Exemple** : Capturer l'événement `click` sur un bouton pour déclencher une action.
+   
+   ```html
+   <button (click)="handleClick()">Click me</button>
+   ```
+
+   ```typescript
+   handleClick() {
+     alert('Button clicked!');
+   }
+   ```
+
+2. **Communication Entre Composants** :
+   - **Exemple** : Utiliser des événements personnalisés pour envoyer des données d'un composant enfant à un composant parent.
+
+3. **Formulaires Réactifs** :
+   - **Exemple** : Capturer l'événement `submit` d'un formulaire pour valider et envoyer les données.
+   
+   ```html
+   <form (ngSubmit)="onSubmit()" [formGroup]="myForm">
+     <input formControlName="name" />
+     <button type="submit">Submit</button>
+   </form>
+   ```
+
+   ```typescript
+   onSubmit() {
+     console.log(this.myForm.value);
+   }
+   ```
+
+4. **Événements de Cycle de Vie** :
+   - **Exemple** : Utiliser les événements de cycle de vie des composants comme `ngOnInit`, `ngOnChanges`, etc., pour gérer le comportement du composant au cours de sa vie.
+
+   ```typescript
+   export class MyComponent implements OnInit {
+     ngOnInit() {
+       console.log('Component initialized');
+     }
+   }
+   ```
+
+#### Résumé
+
+Les événements en Angular permettent de gérer les interactions utilisateur, de communiquer entre les composants, et de répondre aux changements d'état dans l'application. En utilisant les événements DOM, les événements personnalisés avec `@Output` et `EventEmitter`, et le décorateur `@HostListener`, les développeurs peuvent créer des applications réactives et interactives.
+
+### Questions de Résumé du Cours sur les Événements en Angular
+
+1. **Qu'est-ce qu'un événement DOM en Angular et comment le gérer dans un template ?**
+2. **Comment créer et émettre un événement personnalisé dans un composant Angular ?**
+3. **Comment utiliser `@HostListener` pour gérer les événements DOM dans la classe d'un composant ?**
+4. **Quels sont les cas d'utilisation courants des événements en Angular ?**
+5. **Comment les événements personnalisés facilitent-ils la communication entre les composants parent et enfant ?**
+6. **Quel est le rôle des événements de cycle de vie dans la gestion des composants Angular ?**
+
+En répondant à ces questions, vous pouvez vérifier la compréhension des concepts et des pratiques liés à la gestion des événements en Angular.
+
 ## Le Data Binding Bidirectionnel (Two-Way Binding) en Angular
 
 Le data binding bidirectionnel (two-way binding) en Angular permet de synchroniser les données entre un composant et son template. Cela signifie que les modifications dans le modèle de données sont automatiquement reflétées dans la vue, et vice versa. Cette fonctionnalité est particulièrement utile dans les formulaires où les données de l'utilisateur doivent être synchronisées avec le modèle.
@@ -299,65 +359,7 @@ Dans cet exemple, la valeur de l'input est liée à la propriété `name` du com
 
 En posant ces questions, vous pouvez évaluer la compréhension des concepts et des pratiques liés au data binding bidirectionnel en Angular.
 
-## Cas d'Utilisation des Événements
 
-1. **Interaction Utilisateur** :
-   - **Exemple** : Capturer l'événement `click` sur un bouton pour déclencher une action.
-   
-   ```html
-   <button (click)="handleClick()">Click me</button>
-   ```
-
-   ```typescript
-   handleClick() {
-     alert('Button clicked!');
-   }
-   ```
-
-2. **Communication Entre Composants** :
-   - **Exemple** : Utiliser des événements personnalisés pour envoyer des données d'un composant enfant à un composant parent.
-
-3. **Formulaires Réactifs** :
-   - **Exemple** : Capturer l'événement `submit` d'un formulaire pour valider et envoyer les données.
-   
-   ```html
-   <form (ngSubmit)="onSubmit()" [formGroup]="myForm">
-     <input formControlName="name" />
-     <button type="submit">Submit</button>
-   </form>
-   ```
-
-   ```typescript
-   onSubmit() {
-     console.log(this.myForm.value);
-   }
-   ```
-
-4. **Événements de Cycle de Vie** :
-   - **Exemple** : Utiliser les événements de cycle de vie des composants comme `ngOnInit`, `ngOnChanges`, etc., pour gérer le comportement du composant au cours de sa vie.
-
-   ```typescript
-   export class MyComponent implements OnInit {
-     ngOnInit() {
-       console.log('Component initialized');
-     }
-   }
-   ```
-
-#### Résumé
-
-Les événements en Angular permettent de gérer les interactions utilisateur, de communiquer entre les composants, et de répondre aux changements d'état dans l'application. En utilisant les événements DOM, les événements personnalisés avec `@Output` et `EventEmitter`, et le décorateur `@HostListener`, les développeurs peuvent créer des applications réactives et interactives.
-
-### Questions de Résumé du Cours sur les Événements en Angular
-
-1. **Qu'est-ce qu'un événement DOM en Angular et comment le gérer dans un template ?**
-2. **Comment créer et émettre un événement personnalisé dans un composant Angular ?**
-3. **Comment utiliser `@HostListener` pour gérer les événements DOM dans la classe d'un composant ?**
-4. **Quels sont les cas d'utilisation courants des événements en Angular ?**
-5. **Comment les événements personnalisés facilitent-ils la communication entre les composants parent et enfant ?**
-6. **Quel est le rôle des événements de cycle de vie dans la gestion des composants Angular ?**
-
-En répondant à ces questions, vous pouvez vérifier la compréhension des concepts et des pratiques liés à la gestion des événements en Angular.
 
 ## Création et Utilisation de Service en Angular
 
