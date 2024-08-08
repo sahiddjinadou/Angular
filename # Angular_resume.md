@@ -691,37 +691,391 @@ Pour résumer le contenu d'un cours sur les modules partagés en Angular, vous p
 Ces questions permettent de vérifier la compréhension des concepts fondamentaux relatifs aux modules partagés en Angular, leur création, leur utilisation, et leurs avantages. Elles aident également à mettre en lumière les meilleures pratiques et les pièges courants à éviter.
 
 
+Le **Routing** en Angular permet de naviguer entre différentes vues ou composants au sein d'une application de manière fluide et intuitive, en modifiant l'URL du navigateur. Voici une vue d'ensemble sur le fonctionnement du routing en Angular et les étapes pour le mettre en place.
+
+### Concepts Clés du Routing en Angular
+
+1. **RouterModule** : 
+   - Module d'Angular qui permet de configurer et gérer le routage dans l'application.
+   - Il fournit des services, des directives et des classes nécessaires pour le routage.
+
+2. **Routes** :
+   - Configuration des chemins d'URL et des composants associés.
+   - Chaque route est un objet avec des propriétés comme `path` et `component`.
+
+3. **RouterOutlet** :
+   - Directive qui agit comme un espace réservé où les vues des composants correspondants aux routes définies seront rendues.
+
+4. **RouterLink** :
+   - Directive pour créer des liens de navigation.
+
+### Étapes pour Configurer le Routing en Angular
+
+#### 1. Configurer les Routes
+
+Définir les routes dans un module de routage (souvent appelé `AppRoutingModule`).
+
+```typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
+  { path: 'about', component: AboutComponent },
+  { path: '**', component: PageNotFoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+#### 2. Ajouter `RouterOutlet` dans le Template
+
+Ajouter `<router-outlet>` dans le template principal (souvent `AppComponent`) pour indiquer où afficher les composants routés.
+
+```html
+<router-outlet></router-outlet>
+```
+
+#### 3. Utiliser `RouterLink` pour la Navigation
+
+Utiliser la directive `routerLink` pour créer des liens de navigation.
+
+```html
+<nav>
+  <a routerLink="/home">Home</a>
+  <a routerLink="/about">About</a>
+</nav>
+```
+
+#### 4. Importer `AppRoutingModule` dans `AppModule`
+
+Assurez-vous d'importer et de déclarer `AppRoutingModule` dans le module principal de l'application (`AppModule`).
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    AboutComponent,
+    PageNotFoundComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### Cas d'Utilisation Avancés
+
+#### 1. Routes Enfant (Nested Routes)
+
+Vous pouvez avoir des routes enfant pour gérer des vues imbriquées.
+
+```typescript
+const routes: Routes = [
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    children: [
+      { path: 'statistics', component: StatisticsComponent },
+      { path: 'reports', component: ReportsComponent }
+    ]
+  }
+];
+```
+
+#### 2. Paramètres de Route
+
+Pour passer des paramètres dans l'URL, utilisez `:param`.
+
+```typescript
+const routes: Routes = [
+  { path: 'user/:id', component: UserComponent }
+];
+```
+
+Pour accéder aux paramètres dans le composant :
+
+```typescript
+import { ActivatedRoute } from '@angular/router';
+
+export class UserComponent {
+  constructor(private route: ActivatedRoute) {
+    this.route.params.subscribe(params => {
+      console.log(params['id']);
+    });
+  }
+}
+```
+Pour récupérer le paramètre `id` d'une URL dans un composant Angular, vous pouvez utiliser le service `ActivatedRoute`. Ce service permet d'accéder aux informations de la route active, y compris les paramètres de route. Voici comment procéder :
+
+### Étapes pour Récupérer le Paramètre `id`
+
+1. **Définir la Route** :
+   - Comme vous l'avez déjà fait, définissez une route avec un paramètre dynamique `id` :
+   ```typescript
+   const routes: Routes = [
+     { path: 'user/:id', component: UserComponent }
+   ];
+   ```
+
+2. **Injecter `ActivatedRoute` dans le Composant** :
+   - Dans le composant `UserComponent`, vous allez injecter `ActivatedRoute` pour accéder aux paramètres de route.
+
+3. **Récupérer le Paramètre `id`** :
+   - Utilisez `this.route.snapshot.paramMap.get('id')` pour obtenir la valeur du paramètre `id` au moment où le composant est initialisé.
+   - Ou utilisez `this.route.paramMap.subscribe(params => ...)` pour écouter les changements de paramètres de route (utile si le composant reste chargé et que seul l'ID change).
+
+### Exemple Complet
+
+Voici un exemple de comment faire cela dans le composant `UserComponent` :
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-user',
+  templateUrl: './user.component.html'
+})
+export class UserComponent implements OnInit {
+  userId!: string;  // Ou number, selon votre logique
+
+  constructor(private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    // Méthode 1 : Récupérer le paramètre ID une seule fois lors de l'initialisation
+    this.userId = this.route.snapshot.paramMap.get('id') || '';
+
+    // Méthode 2 : S'abonner aux changements de paramètre ID (utile si le paramètre peut changer sans rechargement du composant)
+    this.route.paramMap.subscribe(params => {
+      this.userId = params.get('id') || '';
+    });
+  }
+}
+```
+
+### Explication des Méthodes
+
+1. **Méthode 1 : `this.route.snapshot.paramMap.get('id')`** :
+   - Utilisez cette méthode pour obtenir le paramètre `id` lors de l'initialisation du composant.
+   - C'est pratique si le paramètre ne changera pas tant que le composant est chargé.
+
+2. **Méthode 2 : `this.route.paramMap.subscribe(params => {...})`** :
+   - Utilisez cette méthode pour vous abonner aux changements de paramètres. Si l'ID change mais que le composant reste chargé, cette méthode garantit que vous obtenez toujours la valeur la plus à jour.
+   - Cette approche est utile dans des scénarios où le composant `UserComponent` pourrait être réutilisé pour afficher différents utilisateurs sans être détruit et recréé à chaque changement d'ID.
+
+
+
+
+
+
+#### 3. Guards (Garde de Route)
+
+Pour protéger les routes, utilisez des guards comme `CanActivate`.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(private router: Router) {}
+
+  canActivate(): boolean {
+    const isAuthenticated = // logique d'authentification
+    if (!isAuthenticated) {
+      this.router.navigate(['/login']);
+      return false;
+    }
+    return true;
+  }
+}
+```
+
+Et configurez la route avec le guard :
+
+```typescript
+const routes: Routes = [
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
+];
+```
+
+
+
+
+### Questions de Résumé du Cours sur le Routing en Angular
+
+1. **Qu'est-ce que le `RouterModule` et quel est son rôle dans Angular ?**
+2. **Comment définir une route de base dans Angular ?**
+3. **À quoi sert la directive `<router-outlet>` dans Angular ?**
+4. **Comment créer un lien de navigation avec `routerLink` ?**
+5. **Comment configurer des routes enfants (nested routes) dans Angular ?**
+6. **Comment passer et accéder à des paramètres de route dans Angular ?**
+7. **Qu'est-ce qu'un guard et comment l'utiliser pour protéger des routes ?**
+8. **Comment rediriger une route par défaut dans Angular ?**
+9. **Comment gérer une route non trouvée (404) avec Angular ?**
+10. **Quels sont les avantages d'utiliser le routing dans une application Angular ?**
+
+En répondant à ces questions, vous pouvez vérifier la compréhension des concepts et des pratiques liés au routing en Angular.
+Ajouter une communication HTTP à une application Angular implique généralement l'utilisation du service `HttpClient`, qui fait partie du module `HttpClientModule` d'Angular. Ce service permet d'envoyer des requêtes HTTP pour interagir avec une API backend (par exemple, pour récupérer des données, envoyer des informations, etc.).
+
+### Étapes pour Ajouter une Communication HTTP
+
+1. **Importer `HttpClientModule` dans votre Module Principal** :
+   - Le module `HttpClientModule` doit être importé dans le module principal de votre application (souvent `AppModule`).
+
+   ```typescript
+   import { BrowserModule } from '@angular/platform-browser';
+   import { NgModule } from '@angular/core';
+   import { HttpClientModule } from '@angular/common/http';
+   import { AppComponent } from './app.component';
+
+   @NgModule({
+     declarations: [
+       AppComponent,
+       // Autres composants
+     ],
+     imports: [
+       BrowserModule,
+       HttpClientModule, // Import du module HttpClient
+       // Autres modules
+     ],
+     providers: [],
+     bootstrap: [AppComponent]
+   })
+   export class AppModule { }
+   ```
+
+2. **Créer un Service pour Gérer les Requêtes HTTP** :
+   - Créez un service Angular pour centraliser la gestion des requêtes HTTP.
+
+   ```typescript
+   import { Injectable } from '@angular/core';
+   import { HttpClient } from '@angular/common/http';
+   import { Observable } from 'rxjs';
+
+   @Injectable({
+     providedIn: 'root'
+   })
+   export class UserService {
+
+     private apiUrl = 'https://api.example.com/users';  // Remplacez par votre API
+
+     constructor(private http: HttpClient) { }
+
+     // Méthode pour obtenir tous les utilisateurs
+     getUsers(): Observable<any> {
+       return this.http.get(this.apiUrl);
+     }
+
+     // Méthode pour obtenir un utilisateur par ID
+     getUserById(id: string): Observable<any> {
+       return this.http.get(`${this.apiUrl}/${id}`);
+     }
+
+     // Méthode pour créer un nouvel utilisateur
+     createUser(user: any): Observable<any> {
+       return this.http.post(this.apiUrl, user);
+     }
+
+     // Méthode pour mettre à jour un utilisateur
+     updateUser(id: string, user: any): Observable<any> {
+       return this.http.put(`${this.apiUrl}/${id}`, user);
+     }
+
+     // Méthode pour supprimer un utilisateur
+     deleteUser(id: string): Observable<any> {
+       return this.http.delete(`${this.apiUrl}/${id}`);
+     }
+   }
+   ```
+
+3. **Utiliser le Service dans un Composant** :
+   - Injectez le service dans un composant pour l'utiliser et interagir avec l'API.
+
+   ```typescript
+   import { Component, OnInit } from '@angular/core';
+   import { UserService } from './user.service';
+
+   @Component({
+     selector: 'app-user-list',
+     template: `
+       <h2>Liste des Utilisateurs</h2>
+       <ul>
+         <li *ngFor="let user of users">
+           {{ user.name }} ({{ user.email }})
+         </li>
+       </ul>
+     `
+   })
+   export class UserListComponent implements OnInit {
+
+     users: any[] = [];
+
+     constructor(private userService: UserService) { }
+
+     ngOnInit(): void {
+       this.userService.getUsers().subscribe(data => {
+         this.users = data;
+       });
+     }
+   }
+   ```
+
+4. **Gérer les Erreurs HTTP** :
+   - Il est important de gérer les erreurs lors des requêtes HTTP. Utilisez `catchError` pour capturer les erreurs.
+
+   ```typescript
+   import { catchError } from 'rxjs/operators';
+   import { throwError } from 'rxjs';
+
+   getUsers(): Observable<any> {
+     return this.http.get(this.apiUrl).pipe(
+       catchError(this.handleError)
+     );
+   }
+
+   private handleError(error: any) {
+     console.error('An error occurred', error);
+     return throwError('Something went wrong; please try again later.');
+   }
+   ```
+
+### Explications et Bonnes Pratiques
+
+- **Centralisation dans un Service** : La logique de communication HTTP est centralisée dans un service (`UserService` dans l'exemple), ce qui rend le code plus modulaire et plus facile à maintenir.
+- **Gestion des Erreurs** : En utilisant `catchError`, vous pouvez gérer les erreurs de manière cohérente, ce qui est crucial pour une application robuste.
+- **Observable** : Le service `HttpClient` retourne des `Observable`, ce qui permet de gérer de manière asynchrone les réponses HTTP. Vous pouvez utiliser `subscribe` pour vous abonner aux résultats des requêtes.
+
+### Conclusion
+
+En ajoutant une communication HTTP via `HttpClient` à votre application Angular, vous pouvez interagir efficacement avec des API backend pour récupérer ou envoyer des données, améliorant ainsi les fonctionnalités de votre application. Les services jouent un rôle crucial dans la gestion de cette communication, en maintenant la séparation des préoccupations et en facilitant la réutilisation du code.
 
 # Refference
 
 https://angular.dev/guide/templates/class-binding
 
 
-```js
-dateDuJour() {
-    // Crée une instance de Date à partir du timestamp
-    const date = new Date(Date.now());
-
-    // Options de formatage pour une date lisible
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZoneName: 'short',
-    };
-
-    // Retourne la date formatée
-    return date.toLocaleString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZoneName: 'short',
-    });
-  }
-```
