@@ -1077,5 +1077,5 @@ En ajoutant une communication HTTP via `HttpClient` à votre application Angular
 # Refference
 
 https://angular.dev/guide/templates/class-binding
-
+https://jsonplaceholder.typicode.com/users
 
