@@ -922,7 +922,154 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
 ];
 ```
+Pour envoyer un message ou des données à travers une route avec des paramètres de requête (query parameters) en Angular, tu peux utiliser le service `Router` pour naviguer vers une nouvelle route et ajouter des paramètres de requête à l'URL. Voici un guide détaillé pour le faire :
 
+### 1. **Envoyer des Paramètres de Requête**
+
+**1.1. Configurer les Routes**
+
+Tout d'abord, assure-toi que les routes sont configurées dans ton module de routage. Par exemple :
+
+```typescript
+// app-routing.module.ts
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { SenderComponent } from './sender/sender.component';
+import { ReceiverComponent } from './receiver/receiver.component';
+
+const routes: Routes = [
+  { path: 'sender', component: SenderComponent },
+  { path: 'receiver', component: ReceiverComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+**1.2. Envoyer des Données avec Query Parameters**
+
+Utilise le service `Router` pour naviguer vers une route avec des paramètres de requête. 
+
+```typescript
+// sender.component.ts
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-sender',
+  template: `<button (click)="sendMessage()">Send Message</button>`
+})
+export class SenderComponent {
+
+  constructor(private router: Router) { }
+
+  sendMessage() {
+    this.router.navigate(['/receiver'], { queryParams: { message: 'Hello from Sender!' } });
+  }
+}
+```
+
+### 2. **Recevoir les Paramètres de Requête**
+
+**2.1. Lire les Paramètres dans le Composant Récepteur**
+
+Dans le composant récepteur, utilise le service `ActivatedRoute` pour lire les paramètres de requête.
+
+```typescript
+// receiver.component.ts
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-receiver',
+  template: `<div>Message: {{ message }}</div>`
+})
+export class ReceiverComponent implements OnInit {
+  message: string | null = '';
+
+  constructor(private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.message = params['message'] || 'No message';
+    });
+  }
+}
+```
+
+### 3. **Explication des Étapes**
+
+- **Configuration des Routes** : Les routes doivent être configurées dans `app-routing.module.ts` pour permettre la navigation entre les composants.
+- **Navigation avec Query Parameters** : Utilise la méthode `navigate` du service `Router` pour envoyer des paramètres de requête. Les paramètres sont passés dans l'objet `queryParams`.
+- **Lecture des Query Parameters** : Dans le composant récepteur, utilise `ActivatedRoute` pour accéder aux paramètres de requête. Les paramètres peuvent être lus en s'abonnant à l'observable `queryParams`.
+
+### Exemple Complet
+
+Voici un exemple complet des fichiers nécessaires :
+
+**`app-routing.module.ts`**
+```typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { SenderComponent } from './sender/sender.component';
+import { ReceiverComponent } from './receiver/receiver.component';
+
+const routes: Routes = [
+  { path: 'sender', component: SenderComponent },
+  { path: 'receiver', component: ReceiverComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+**`sender.component.ts`**
+```typescript
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-sender',
+  template: `<button (click)="sendMessage()">Send Message</button>`
+})
+export class SenderComponent {
+  constructor(private router: Router) { }
+
+  sendMessage() {
+    this.router.navigate(['/receiver'], { queryParams: { message: 'Hello from Sender!' } });
+  }
+}
+```
+
+**`receiver.component.ts`**
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-receiver',
+  template: `<div>Message: {{ message }}</div>`
+})
+export class ReceiverComponent implements OnInit {
+  message: string | null = '';
+
+  constructor(private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.message = params['message'] || 'No message';
+    });
+  }
+}
+```
+
+Avec cette configuration, lorsque tu cliques sur le bouton dans `SenderComponent`, tu es redirigé vers `ReceiverComponent` avec le message passé en tant que paramètre de requête, et tu peux le lire et l'afficher dans le composant récepteur.
 
 
 
